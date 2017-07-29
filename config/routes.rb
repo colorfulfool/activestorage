@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   get "/rails/active_storage/blobs/:signed_id/*filename" => "active_storage/blobs#show", as: :rails_service_blob
 
   direct :rails_blob do |blob|
-    route_for(:rails_service_blob, blob.signed_id, blob.filename)
+    blob.service_url
   end
 
   resolve("ActiveStorage::Blob")       { |blob| route_for(:rails_blob, blob) }
@@ -12,11 +12,7 @@ Rails.application.routes.draw do
   get  "/rails/active_storage/variants/:signed_blob_id/:variation_key/*filename" => "active_storage/variants#show", as: :rails_blob_variation
 
   direct :rails_variant do |variant|
-    signed_blob_id = variant.blob.signed_id
-    variation_key  = variant.variation.key
-    filename       = variant.blob.filename
-
-    route_for(:rails_blob_variation, signed_blob_id, variation_key, filename)
+    variant.processed.service_url
   end
 
   resolve("ActiveStorage::Variant") { |variant| route_for(:rails_variant, variant) }
